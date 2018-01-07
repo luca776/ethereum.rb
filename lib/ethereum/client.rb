@@ -78,7 +78,7 @@ module Ethereum
     
 
     def transfer_to(address, amount)
-      eth_send_transaction({to: address, value: int_to_hex(amount)})
+      eth_send_transaction({from: default_account, to: address, value: int_to_hex(amount)})
     end
 
     def transfer_to_and_wait(address, amount)
@@ -88,7 +88,7 @@ module Ethereum
 
     def transfer(key, address, amount)
       Eth.configure { |c| c.chain_id = net_version["result"].to_i }
-      args = { 
+      args = {
         from: key.address,
         to: address,
         value: amount,
@@ -101,11 +101,11 @@ module Ethereum
       tx.sign key
       eth_send_raw_transaction(tx.hex)["result"]
     end
-    
+
     def transfer_and_wait(key, address, amount)
       return wait_for(transfer(key, address, amount))
     end
-    
+
     def wait_for(tx)
       transaction = Ethereum::Transaction.new(tx, self, "", [])
       transaction.wait_for_miner
@@ -141,4 +141,3 @@ module Ethereum
   end
 
 end
-
